@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div>
+    <h1>Movies</h1>
+    <div>
+        <p>{{ nums['movies'] }} pending
+            <p><a href="/movies">[Go to Movie Page]</a>
+    </div>
+    <div>
+        <h1>TV Episodes</h1>
+        <p>{{ nums['episodes'] }} pending
+            <p><a href="/episodes">[Go to Episode Page]</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,148 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h1>Movies Pending</h1>
+{% if entries %}
+{% for entry in entries %}
+<div>
+    <hr>
+    <div>
+        <form method="POST" action="" novalidate>
+            {{ form.hidden_tag() }}
+            <table>
+                <tr>
+                    <td>
+                        {{ form.file_name.label }}
+                    </td>
+                    <td>
+                        {{ form.file_name(readonly=True, size=100, 
+                                           value=entry['filename']) }}<br>
+                        {% for error in form.file_name.errors %}
+                        <span style="color: red;">
+                            [{{ error }}]
+                        </span>
+                        {% endfor %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        {{ form.path_name.label }}
+                    </td>
+                    <td>
+                        {{ form.path_name(readonly=True, size=100, 
+                                           value=entry['path']) }}<br>
+                        {% for error in form.path_name.errors %}
+                        <span style="color: red;">
+                            [{{ error }}]
+                        </span>
+                        {% endfor %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        {{ form.dir_name.label }}
+                    </td>
+                    <td>
+                        {{ form.dir_name(size=100, 
+                                          value=entry['proposed']) }}<br>
+                        {% for error in form.dir_name.errors %}
+                        <span style="color: red;">
+                            [{{ error }}]
+                        </span>
+                        {% endfor %}
+                    </td>
+                </tr>
+            </table>
+            <div>
+                {{ form.submit() }}
+                <a target="_blank" rel="noopener noreferrer"
+                    href="https://www.imdb.com/find?ref_=nv_sr_fn&q={{ entry['search'][0] }}+%28{{ entry['search'][1] }}%29&s=tt">
+                    {{ '[Check IMDB for {} ({})]'.format(*entry['search']) }}</a>
+            </div>
+        </form>
+    </div>
+    {% if entry['download']['http_status'] != 200 %}
+    <div>
+        <table>
+            <tr>
+                <td>
+                    <div style="width:100px;">
+                    </div>
+                </td>
+                <td>
+                    <font color="red">{{ entry['download'] }}</font>
+                </td>
+            </tr>
+        </table>
+    </div>
+    {% elif entry['download']['total_results'] == 0 %}
+    <div>
+        <table>
+            <tr>
+                <td>
+                    <div style="width:100px; height:50px;">
+                    </div>
+                </td>
+                <td>
+                    <font color="red"><i>TMDb API returned no matches.</i></font>
+                </td>
+            </tr>
+        </table>
+    </div>
+    {% else %}
+    {% for result in entry['download']['results'] %}
+    <div>
+        <table>
+            <tr>
+                <div>
+                    <td>
+                        <div style="width:100px;">
+                        </div>
+                    </td>
+                    <td>
+                        <div style="width:150px;" align="center">
+                            <a href="https://www.themoviedb.org/movie/{{ result['id'] }}}">
+                                {% if result['order'] == 0 %}
+                                <IMG SRC="{{ result['poster_path'] }}" ALT="poster for {{ result['title'] }}"
+                                    HEIGHT=200>
+                                {% else %}
+                                <IMG SRC="{{ result['poster_path'] }}" ALT="poster for {{ result['title'] }}"
+                                    HEIGHT=100>
+                                {% endif %}
+                            </a>
+                        </div>
+                    </td>
+                    <td>
+                        {% if result['order'] == 0 %}
+                        <p><a href="https://www.themoviedb.org/movie/{{ result['id'] }}}">
+                                {{ result['title'] }}</a> -
+                            {{ result['release_date'] }}</p>
+                        {% if result['original_title'] != result['title'] %}
+                        <p>Original Title: {{ result['original_title'] }}</p>
+                        {% endif %}
+                        <p>{{ result['overview'] }}</p>
+                        {% else %}
+                        <small>
+                            <p><a href="https://www.themoviedb.org/movie/{{ result['id'] }}}">
+                                    {{ result['title'] }}</a> -
+                                {{ result['release_date'] }}</p>
+                            {% if result['original_title'] != result['title'] %}
+                            <p>Original Title: {{ result['original_title'] }}</p>
+                            {% endif %}
+                            <p>{{ result['overview'] }}</p>
+                        </small>
+                        {% endif %}
+                    </td>
+                </div>
+            </tr>
+        </table>
+    </div>
+    {% endfor %}
+    {% endif %}
+</div>
+{% endfor %}
+{% else %}
+<i>Directory Empty</i>
+{% endif %}
+
+{% endblock %}

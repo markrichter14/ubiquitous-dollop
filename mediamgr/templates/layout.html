@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    {% if title %}
+    <title>{{ title }} - NAS Media Manager</title>
+    {% else %}
+    <title>Welcome to NAS Media Manager</title>
+    {% endif %}
+</head>
+
+<body>
+    <div>
+        NAS Media Manager: <a href="{{ url_for('home') }}">[Home]</a>
+    </div>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div style="background-color:yellow">
+        <ul>
+            {% for message in messages %}
+            <b>
+                <li>{{ message }}</li>
+            </b>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    {% endwith %}
+    <hr>
+    {% block content %}
+    {% endblock %}
+</body>
+
+</html>

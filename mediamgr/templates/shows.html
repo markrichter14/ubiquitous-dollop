@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h1>TV Shows</h1>
+<div>
+    {% for entry in entries %}
+    <div>
+        <hr>
+        <h2>{{ entry['dir_name'] }}</h2>
+        {% if entry['data'] %}
+        {% for item in entry['data'] %}
+        <div>
+            <table style="margin-left: 100px">
+                <tr style="border: 2px solid black">
+                    <td style="border: 1px solid black; width: 100px; text-align: center">
+                        {{loop.index}}
+                    </td>
+                    <td style="border: 1px solid black; padding: 10px">
+                        <p>seriesName: {{ item['seriesName'] }} 
+                            (matches: {{ entry['dir_name'] == item['seriesName'] }}) </p>
+                        <p>id: {{ item['id'] }}</p>
+                        <p>network: {{ item['network'] }}</p>
+                        <p>overview: {{ item['overview'] }}</p>
+                        <p>slug: {{ item['slug'] }}</p>
+                        <p>status: {{ item['status'] }}</p>
+                        <p>{{ item }}</p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
