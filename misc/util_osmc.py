@@ -4,7 +4,7 @@ import shutil
 import re
 
 MOVE_DIR = ''
-TV_DIR = ''
+TV_DIR = '\\\\OSMC\\Media\\Video\\TV Shows\\'
 
 FILE_TYPES = [".mp4", ".avi", ".srt", ".m4v", ".mkv", ".mpg"]
 EXCLUDE_FOLDERS = ["Sample"]

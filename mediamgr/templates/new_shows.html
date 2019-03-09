@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h1>New Shows</h1>
+
+<form method="POST" action="" novalidate enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <table>
+        <tr>
+            <td>
+                {{ form.new_show_names.label }}
+            </td>
+            <td>
+                {{ form.new_show_names() }}<br>
+                {% for error in form.new_show_names.errors %}
+                <span style="color: red;">
+                    [{{ error }}]
+                </span>
+                {% endfor %}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                {{ form.text_file.label }}
+            </td>
+            <td>
+                {{ form.text_file() }}<br>
+                {% for error in form.text_file.errors %}
+                <span style="color: red;">
+                    [{{ error }}]
+                </span>
+                {% endfor %}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                {{ form.submit() }}
+            </td>
+        </tr>
+    </table>
+</form>
+
+{% endblock %}

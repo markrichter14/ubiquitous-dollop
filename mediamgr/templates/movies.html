@@ -3,10 +3,10 @@
 {% block content %}
 <h1>Movies Pending</h1>
 {% if entries %}
-{% for entry in entries %}
 <div>
-    <hr>
+    {% for entry in entries %}
     <div>
+        <hr>
         <form method="POST" action="" novalidate>
             {{ form.hidden_tag() }}
             <table>
@@ -53,54 +53,27 @@
                     </td>
                 </tr>
             </table>
-            <div>
-                {{ form.submit() }}
-                <a target="_blank" rel="noopener noreferrer"
-                    href="https://www.imdb.com/find?ref_=nv_sr_fn&q={{ entry['search'][0] }}+%28{{ entry['search'][1] }}%29&s=tt">
-                    {{ '[Check IMDB for {} ({})]'.format(*entry['search']) }}</a>
-            </div>
+            {{ form.submit() }}
+            <a target="_blank" rel="noopener noreferrer"
+                href="https://www.imdb.com/find?ref_=nv_sr_fn&q={{ entry['search'][0] }}+%28{{ entry['search'][1] }}%29&s=tt">
+                {{ '[Check IMDB for {} ({})]'.format(*entry['search']) }}
+            </a>
         </form>
-    </div>
-    {% if entry['download']['http_status'] != 200 %}
-    <div>
-        <table>
-            <tr>
-                <td>
-                    <div style="width:100px;">
-                    </div>
-                </td>
-                <td>
-                    <font color="red">{{ entry['download'] }}</font>
-                </td>
-            </tr>
-        </table>
-    </div>
-    {% elif entry['download']['total_results'] == 0 %}
-    <div>
-        <table>
-            <tr>
-                <td>
-                    <div style="width:100px; height:50px;">
-                    </div>
-                </td>
-                <td>
-                    <font color="red"><i>TMDb API returned no matches.</i></font>
-                </td>
-            </tr>
-        </table>
-    </div>
-    {% else %}
-    {% for result in entry['download']['results'] %}
-    <div>
-        <table>
-            <tr>
-                <div>
+        {% if entry['download']['http_status'] != 200 %}
+        <p style="color: red; font-style: italic; margin-top: 15px; margin-left: 100px">
+            {{ entry['download'] }}
+        </p>
+        {% elif entry['download']['total_results'] == 0 %}
+        <p style="color: red; font-style: italic; margin-top: 15px; margin-left: 100px">
+            TMDb API returned no matches.
+        </p>
+        {% else %}
+        <div>
+            {% for result in entry['download']['results'] %}
+            <table>
+                <tr>
                     <td>
-                        <div style="width:100px;">
-                        </div>
-                    </td>
-                    <td>
-                        <div style="width:150px;" align="center">
+                        <div style="width:150px; margin-left: 100px; margin-top: 15px" align="center">
                             <a href="https://www.themoviedb.org/movie/{{ result['id'] }}}">
                                 {% if result['order'] == 0 %}
                                 <IMG SRC="{{ result['poster_path'] }}" ALT="poster for {{ result['title'] }}"
@@ -113,36 +86,32 @@
                         </div>
                     </td>
                     <td>
-                        {% if result['order'] == 0 %}
-                        <p><a href="https://www.themoviedb.org/movie/{{ result['id'] }}}">
-                                {{ result['title'] }}</a> -
-                            {{ result['release_date'] }}</p>
-                        {% if result['original_title'] != result['title'] %}
-                        <p>Original Title: {{ result['original_title'] }}</p>
-                        {% endif %}
-                        <p>{{ result['overview'] }}</p>
-                        {% else %}
-                        <small>
-                            <p><a href="https://www.themoviedb.org/movie/{{ result['id'] }}}">
-                                    {{ result['title'] }}</a> -
-                                {{ result['release_date'] }}</p>
-                            {% if result['original_title'] != result['title'] %}
-                            <p>Original Title: {{ result['original_title'] }}</p>
+                        {% if result['order'] == 0 %}<div>{% else %}<small>{% endif %}
+                        <div>
+                            <p>{{ result['title'] }} ({{ result['release_date'][:4] }}) -
+                                <i><small>{{ result['release_date'] }}</small></i>
+                            </p>
+                            {% if result['original_title'] != result['title'] %}</p>
+                            <div>
+                                <p>Original Title: {{ result['original_title'] }}</p>
+                            </div>
                             {% endif %}
                             <p>{{ result['overview'] }}</p>
-                        </small>
-                        {% endif %}
+                        </div>
+                        {% if result['order'] == 0 %}</div>{% else %}</small>{% endif %}
                     </td>
-                </div>
-            </tr>
-        </table>
+                </tr>
+            </table>
+            {% endfor %}
+        </div>
+        {% endif %}
     </div>
     {% endfor %}
-    {% endif %}
 </div>
-{% endfor %}
 {% else %}
-<i>Directory Empty</i>
+<span style="color: red; font-style: italic; margin-left: 100px">
+    Directory Empty
+</span>
 {% endif %}
 
 {% endblock %}

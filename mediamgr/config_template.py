@@ -14,6 +14,7 @@ class Config(object):
     '''
 
 
+    # BASE_DIR = ''
     BASE_DIR = ''
     MOVIE_DIR = BASE_DIR + '01_Movies/'
     MOVIE_DEST = BASE_DIR + '01_Movies_Move/'
@@ -21,14 +22,12 @@ class Config(object):
     TV_DEST = BASE_DIR + '01_TV_Move/'
 
     THETVDB = {
-        'BASE_URL' : 'https://api.thetvdb.com',
         'USERNAME' : '',
         'UNIQUE_ID' : '',
         'API_KEY' : '',
-        'TOKEN' : '',
     }
-
+    
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-                                'sqlite:///' + os.path.join(basedir, 'app.db')
+                                'sqlite:///' + os.path.join(basedir, 'mediamgr.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
