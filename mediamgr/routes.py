@@ -2,7 +2,6 @@
     routes.py
 '''
 import os
-#import requests
 from flask import render_template, redirect, flash, url_for
 from werkzeug.utils import secure_filename
 from mediamgr import app, db
@@ -42,9 +41,7 @@ def movies():
     # create folders for files with valid extension, rm junk
     entries = []
     movie_items = (os.scandir(MOVIE_DIR))
-    print('movie items:')
     for item in movie_items:
-        print(item)
         if item.is_file():
             pos = item.name.rfind('.')
             dot_ext = item.name[pos:]
@@ -211,3 +208,4 @@ def episodes():
     texts.append(API.search_series('Rick and Morty'))
     texts.append(API.series(75978))
     return render_template('episodes.html', title='Episodes', texts=texts)
+
