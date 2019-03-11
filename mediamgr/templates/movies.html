@@ -15,7 +15,7 @@
                         {{ form.file_name.label }}
                     </td>
                     <td>
-                        {{ form.file_name(readonly=True, size=100, 
+                        {{ form.file_name(readonly=True, size=100,
                                            value=entry['filename']) }}<br>
                         {% for error in form.file_name.errors %}
                         <span style="color: red;">
@@ -29,7 +29,7 @@
                         {{ form.path_name.label }}
                     </td>
                     <td>
-                        {{ form.path_name(readonly=True, size=100, 
+                        {{ form.path_name(readonly=True, size=100,
                                            value=entry['path']) }}<br>
                         {% for error in form.path_name.errors %}
                         <span style="color: red;">
@@ -43,7 +43,7 @@
                         {{ form.dir_name.label }}
                     </td>
                     <td>
-                        {{ form.dir_name(size=100, 
+                        {{ form.dir_name(size=100,
                                           value=entry['proposed']) }}<br>
                         {% for error in form.dir_name.errors %}
                         <span style="color: red;">
@@ -56,10 +56,16 @@
             {{ form.submit() }}
             <a target="_blank" rel="noopener noreferrer"
                 href="https://www.imdb.com/find?ref_=nv_sr_fn&q={{ entry['search'][0] }}+%28{{ entry['search'][1] }}%29&s=tt">
-                {{ '[Check IMDB for {} ({})]'.format(*entry['search']) }}
+                {% if entry['search']%}
+                    {{ '[Check IMDB for {} ({})]'.format(*entry['search']) }}
+                {% endif %}
             </a>
         </form>
-        {% if entry['download']['http_status'] != 200 %}
+        {% if not entry['search'] %}
+        <p style="color: red; font-style: italic; margin-top: 15px; margin-left: 100px">
+            parse_movie_fn('{{ entry['filename'] }}') failed!
+        </p>
+        {% elif entry['download']['http_status'] != 200 %}
         <p style="color: red; font-style: italic; margin-top: 15px; margin-left: 100px">
             {{ entry['download'] }}
         </p>

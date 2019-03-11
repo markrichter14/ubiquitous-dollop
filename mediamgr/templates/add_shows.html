@@ -191,16 +191,16 @@
         </div>
         {% endfor %}
         {% else %}
-        <span style="color: red; font-style: italic; margin-left: 100px">
+        <p style="color: red; font-style: italic; margin-top: 15px; margin-left: 100px">
             theTVDB API returned no matches.
-        </span>
+        </p>
         {% endif %}
     </div>
     {% endfor %}
     {% else %}
-    <span style="color: red; font-style: italic; margin-left: 100px">
+    <p style="color: red; font-style: italic; margin-top: 15px; margin-left: 100px">
         No new shows to add
-    </span>
+    </p>
     {% endif %}
 </div>
 {% endblock %}

@@ -1,56 +1,10 @@
 '''
     theTvDb API
 '''
-import time
-#import json
 import requests
+from mediamgr.utils import memoize_with_limit
 
 TIMEOUT = 10
-
-def get_id_tuple(f, args, kwargs, mark=object()):
-    """
-    Some quick'n'dirty way to generate a unique key for an specific call.
-    """
-    # l = [id(f)]
-    # for arg in args:
-    #     l.append(id(arg))
-    # #l.append(id(mark))
-    # for k, v in kwargs:
-    #     l.append(k)
-    #     l.append(id(v))
-    l = []
-    for arg in args:
-        l.append(arg)
-    for k, v in kwargs:
-        l.append(k)
-        l.append(v)
-    return tuple(l)
-
-def memoize_with_limit(func):
-    """
-        memoize with time limit
-    """
-    cache = {}
-    LIMIT = 60*60 # seconds in 1 hour
-    def memoized(*args, **kwargs):
-        print('memoized')
-        now = int(time.time())
-        print(now)
-        key = get_id_tuple(func, args, kwargs)
-        print('key:', key)
-        missing = key not in cache
-        print('missing:', missing)
-        if missing or (now - cache[key]['retrieved'] > LIMIT):
-            res = func(*args, **kwargs)
-            if res:
-                print('add/update')
-                cache[key] = {'result': res, 'retrieved': now}
-            elif missing:
-                print('missing/null')
-                cache[key] = {'result': None, 'retrieved': 0}
-        print('size:', len(cache))
-        return cache[key]['result']
-    return memoized
 
 class TheTVDB_API():
     '''
@@ -156,5 +110,3 @@ class TheTVDB_API():
             req = req.json()
             return req.get('data')
         return None
-
-
