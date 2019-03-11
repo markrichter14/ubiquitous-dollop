@@ -3,12 +3,15 @@
 {% block content %}
 <style>
     td.labels {
-        width: 200px; 
-        text-align: right; 
+        width: 200px;
+        text-align: right;
         padding-right: 10px;
     }
  </style>
 <h1>Add TV Shows</h1>
+<form action="{{ url_for('clr_new_show') }}" method="POST">
+    <input style="margin-top: 0px;" type="submit" value="Clear New Show List">
+</form>
 <div>
     {% if entries %}
     {% for entry in entries %}
@@ -16,11 +19,13 @@
         <hr>
         <form action="{{ url_for('delete_new_show', ns_id=entry['id']) }}" method="POST">
             <h2>
-                {{ entry['name'] }} 
-                <input style="width: 100px; margin-left: 50px; margin-right: 50px" 
+                {{ entry['name'] }}
+                <input style="width: 100px; margin-left: 50px; margin-right: 50px"
                        type="submit" value="Delete">
                 {% if entry['matches'] %}
-                    <font color="red"><i>A theTVDB show matches an existing show.</i></font>
+                    <span style="color: red; font-style: italic">
+                        A theTVDB show matches an existing show.
+                    </span>
                 {% endif %}
             </h2>
         </form>
@@ -84,7 +89,7 @@
                                         {{ form.theTVDB_id.label }}
                                     </td>
                                     <td>
-                                        {{ form.theTVDB_id(readonly=True, size=35, 
+                                        {{ form.theTVDB_id(readonly=True, size=35,
                                             value=item['id']) }}<br>
                                         {% for error in form.theTVDB_id.errors %}
                                         <span style="color: red;">
@@ -98,7 +103,7 @@
                                         {{ form.theTVDB_name.label }}
                                     </td>
                                     <td>
-                                        {{ form.theTVDB_name(readonly=True, size=35, 
+                                        {{ form.theTVDB_name(readonly=True, size=35,
                                             value=item['seriesName']) }}<br>
                                         {% for error in form.theTVDB_name.errors %}
                                         <span style="color: red;">
@@ -112,7 +117,7 @@
                                         {{ form.theTVDB_slug.label }}
                                     </td>
                                     <td>
-                                        {{ form.theTVDB_slug(readonly=True, size=35, 
+                                        {{ form.theTVDB_slug(readonly=True, size=35,
                                             value=item['slug']) }}<br>
                                         {% for error in form.theTVDB_slug.errors %}
                                         <span style="color: red;">
@@ -126,7 +131,7 @@
                                         {{ form.theTVDB_status.label }}
                                     </td>
                                     <td>
-                                        {{ form.theTVDB_status(readonly=True, size=35, 
+                                        {{ form.theTVDB_status(readonly=True, size=35,
                                             value=item['status']) }}<br>
                                         {% for error in form.theTVDB_status.errors %}
                                         <span style="color: red;">
@@ -140,7 +145,7 @@
                                         {{ form.new_show_id.label }}
                                     </td>
                                     <td>
-                                        {{ form.new_show_id(readonly=True, size=35, 
+                                        {{ form.new_show_id(readonly=True, size=35,
                                             value=entry['id']) }}<br>
                                         {% for error in form.new_show_id.errors %}
                                         <span style="color: red;">
@@ -154,7 +159,7 @@
                                     </td>
                                     <td style="padding-top: 10px; padding-bottom: 10px">
                                         {% if item['exists'] %}
-                                            {{ form.submit(disabled=True) }} 
+                                            {{ form.submit(disabled=True) }}
                                             <font color="red"><i>A show with this theTVDB ID already exists.</i></font>
                                         {% else %}
                                             {{ form.submit() }}

@@ -1,8 +1,12 @@
-import os, requests
+'''
+    routes.py
+'''
+import os
+#import requests
 from flask import render_template, redirect, flash, url_for
 from werkzeug.utils import secure_filename
 from mediamgr import app, db
-from mediamgr.utils import (VALID, rm_extra_files, tmdb, parse_movie_fn, 
+from mediamgr.utils import (VALID, rm_extra_files, tmdb, parse_movie_fn,
                             get_data, fix_filename)
 from mediamgr.forms import (MovieForm, LoginForm, ShowForm, NewShowsForm)
 from mediamgr.models import Show, Season, Episode, NewShow
@@ -12,10 +16,10 @@ movie_dir = app.config['MOVIE_DIR']
 TV_DIR = app.config['TV_DIR']
 MOVIE_DEST = app.config['MOVIE_DEST']
 
-api = TheTVDB_API(app.config['THETVDB']['USERNAME'], 
-                      app.config['THETVDB']['UNIQUE_ID'], 
-                      app.config['THETVDB']['API_KEY'])
-    
+api = TheTVDB_API(app.config['THETVDB']['USERNAME'],
+                  app.config['THETVDB']['UNIQUE_ID'],
+                  app.config['THETVDB']['API_KEY'])
+
 @app.route('/')
 @app.route('/home')
 def home():
@@ -38,7 +42,7 @@ def movies():
             if dot_ext not in VALID:
                 os.remove(item.path)
                 # TODO logging
-            else: 
+            else:
                 dir_name = item.name[:pos]
                 path = movie_dir + dir_name + '/'
                 os.mkdir(path)
@@ -100,26 +104,38 @@ def delete_new_show(ns_id):
     flash('NewShow {} deleted!'.format(ns.new_show_name))
     return redirect(url_for('add_shows'))
 
+@app.route('/clr_new_show', methods=['POST'])
+def clr_new_show():
+    '''
+        removes all stored new shows entries
+    '''
+    new_shows_qry = NewShow.query.all()
+    for show in new_shows_qry:
+        db.session.delete(show)
+        flash('NewShow {} deleted!'.format(show.new_show_name))
+    db.session.commit()
+    return redirect(url_for('new_shows'))
+
 @app.route('/add_shows', methods=['GET', 'POST'])
 def add_shows():
     entries = []
-    new_shows = NewShow.query.all()
-    for show in sorted(new_shows, key=lambda ns: ns.new_show_name):
-        s = {}
-        s['name'] = show.new_show_name
-        s['id'] = show.new_show_id
+    new_shows_qry = NewShow.query.all()
+    for show in sorted(new_shows_qry, key=lambda ns: ns.new_show_name):
+        entry = {}
+        entry['name'] = show.new_show_name
+        entry['id'] = show.new_show_id
         data = api.search_series(show.new_show_name)
         matches = False
         if data:
-            for di in data:
-                di['fixed'] = fix_filename(di['seriesName'])
-                exists = len(Show.query.filter_by(theTVDB_id=di['id']).all()) > 0
-                di['exists'] = exists
-                matches |= exists 
-            s['data'] = data[:3]
-        s['matches'] = matches
-        entries.append(s)
-    
+            for data_item in data:
+                data_item['fixed'] = fix_filename(data_item['seriesName'])
+                if Show.query.filter_by(theTVDB_id=data_item['id']).all():
+                    data_item['exists'] = True
+                    matches |= True
+            entry['data'] = data[:3]
+        entry['matches'] = matches
+        entries.append(entry)
+
     form = ShowForm()
     if form.validate_on_submit():
         print('validate add_shows')
@@ -156,11 +172,15 @@ def list_shows():
         s['theTVDB_id'] = show.theTVDB_id
         entries.append(s)
     entries = sorted(entries, key=lambda e: e['show_name'])
-    return render_template('list_shows.html', title='List TV Shows', 
+    return render_template('list_shows.html', title='List TV Shows',
                             entries=entries)
 
 @app.route('/episodes')
 def episodes():
-    return render_template('episodes.html', title='Episodes')
+    texts = []
+    texts.append(api.search_series_params())
+    texts.append(api.search_series('Rick and Morty'))
+    texts.append(api.series(75978))
+    return render_template('episodes.html', title='Episodes', texts=texts)
 
 
