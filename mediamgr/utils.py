@@ -64,19 +64,14 @@ def get_id_tuple(func, args, kwargs):
     """
     Some quick'n'dirty way to generate a unique key for a specific call.
     """
-    # l = [id(func)]
-    # for arg in args:
-    #     l.append(id(arg))
-    # #l.append(id(mark))
-    # for k, v in kwargs:
-    #     l.append(k)
-    #     l.append(id(v))
+    # print('func', func)
+    # print('args', args)
+    # print('kwargs', kwargs)
     lst = [func]
     for arg in args:
         lst.append(arg)
-    for key, val in kwargs:
-        lst.append(key)
-        lst.append(val)
+    for key, val in kwargs.items():
+        lst.append((key, val))
     return tuple(lst)
 
 def memoize_with_limit(func):
@@ -86,22 +81,22 @@ def memoize_with_limit(func):
     cache = {}
     limit = 60*60 # seconds in 1 hour
     def memoized(*args, **kwargs):
-        #print('memoized')
+        # print('memoized')
         now = int(time.time())
-        #print(now)
+        # print(now)
         key = get_id_tuple(func, args, kwargs)
-        #print('key:', key)
+        # print('key:', key)
         missing = key not in cache
-        #print('missing:', missing)
+        # print('missing:', missing)
         if missing or (now - cache[key]['retrieved'] > limit):
             res = func(*args, **kwargs)
             if res:
-                #print('add/update')
+                # print('add/update')
                 cache[key] = {'result': res, 'retrieved': now}
             elif missing:
-                #print('missing/null')
+                # print('missing/null')
                 cache[key] = {'result': None, 'retrieved': 0}
-        #print('size:', len(cache))
+        # print('size:', len(cache))
         return cache[key]['result']
     return memoized
 

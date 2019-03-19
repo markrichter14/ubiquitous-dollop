@@ -14,6 +14,8 @@
         NAS Media Manager: <a href="{{ url_for('home') }}">[Home]</a>
                            <a href="{{ url_for('new_shows') }}">[New Shows]</a>
                            <a href="{{ url_for('add_shows') }}">[Add Shows]</a>
+                           <a href="{{ url_for('update_shows') }}">[Update Shows]</a>
+                           <a href="{{ url_for('list_shows') }}">[List Shows]</a>
     </div>
     {% with messages = get_flashed_messages() %}
     {% if messages %}

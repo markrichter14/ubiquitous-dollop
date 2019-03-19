@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h1>List TV Shows</h1>
+<div>
+    {% if entries %}
+    <div>
+        {% for entry in entries %}
+        <div>
+            <hr>
+            <table>
+                <tr>
+                    <td>
+                        Show
+                    </td>
+                    <td>
+                        {{ entry['show_name'] }}
+                        <small>(id: {{ entry['show_id'] }})</small>
+                    </td>
+                </tr>
+                {% if entry['show_name'] != entry['show_dir'] %}
+                <tr>
+                    <td>
+                        Directory
+                    </td>
+                    <td>
+                        {{ entry['show_dir'] }}
+                    </td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td>
+                        Watching
+                    </td>
+                    <td>
+                        {{ entry['watching'] }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        theTVDB id
+                    </td>
+                    <td>
+                        {{ entry['theTVDB_id'] }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <span style="color: red; font-style: italic; margin-left: 100px">
+        No new shows to list
+    </span>
+    {% endif %}
+</div>
+{% endblock %}

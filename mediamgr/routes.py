@@ -184,16 +184,29 @@ def list_shows():
         page to list all show in db
     '''
     entries = []
-    shows = Show.query.all()
-    for show in sorted(shows, key=lambda s: s.show_name):
-        entry = {}
-        entry['show_id'] = show.show_id
-        entry['show_name'] = show.show_name
-        entry['show_dir'] = show.show_dir
-        entry['watching'] = show.watching
-        entry['theTVDB_id'] = show.theTVDB_id
-        entries.append(entry)
-    entries = sorted(entries, key=lambda e: e['show_name'])
+    shows = Show.query.order_by(Show.show_name).all()
+    for show in shows:
+        show_entry = {}
+        show_entry['show'] = show.show_name
+        show_entry['show_id'] = show.show_id
+        show_entry['show_dir'] = show.show_dir
+        show_entry['watching'] = show.watching
+        show_entry['theTVDB_id'] = show.theTVDB_id
+        show_entry['seasons'] = []
+        seasons = Season.query.filter_by(show_id=show.show_id).order_by(Season.season).all()
+        for season in seasons:
+            season_entry = {}
+            season_entry['season'] = season.season
+            season_entry['episodes'] = []
+            episodes = Episode.query.filter_by(season_id=season.season_id).order_by(Episode.episode).all()
+            for episode in episodes:
+                episode_entry = {}
+                episode_entry['episode'] = episode.episode
+                episode_entry['air_date'] = episode.air_date
+                season_entry['episodes'].append(episode_entry)
+            show_entry['seasons'].append(season_entry)
+        entries.append(show_entry)
+
     return render_template('list_shows.html', title='List TV Shows',
                            entries=entries)
 
@@ -204,8 +217,51 @@ def episodes():
         page to process downloaded tv show episodes
     '''
     texts = []
-    texts.append(API.search_series_params())
-    texts.append(API.search_series('Rick and Morty'))
-    texts.append(API.series(75978))
-    return render_template('episodes.html', title='Episodes', texts=texts)
+    print('*** call series')
+    texts.append(API.series(313999))
+    print('*** call series_episodes_summary')
+    texts.append(API.series_episodes_summary(313999))
+    print('*** call series_episodes_query')
+    #entries = API.series_episodes_query(310633, season=2, episode=2)
+    entries = API.series_episodes_query(313999, episode=1)
+    return render_template('episodes.html', title='Episodes', texts=texts, entries=entries)
+
+@app.route('/update_shows')
+def update_shows():
+    '''
+        in development
+        page to update TV show info in db
+    '''
+    shows = Show.query.order_by(Show.show_name).all()
+    for show in shows:
+        print('\n{} - {}'.format(show.show_name, show.theTVDB_id))
+        summary = API.series_episodes_summary(show.theTVDB_id)
+        aired_seasons = summary.get('airedSeasons')
+        for aired_season in aired_seasons:
+            season_num = int(aired_season)
+            season_exists = Season.query.filter_by(show_id=show.show_id, season=season_num).first()
+            print('season_exists:', season_exists)
+            if not season_exists:
+                season_to_add = Season(season=season_num,
+                                       show_id=show.show_id)
+                print('season_to_add:', season_to_add)
+                db.session.add(season_to_add)
+                season_exists = Season.query.filter_by(show_id=show.show_id, season=season_num).first()
+            aired_episodes = API.series_episodes_query(show.theTVDB_id, season=season_num)
+            for episode in aired_episodes:
+                episode_exists = Episode.query.filter_by(season_id=season_exists.season_id,
+                                                         episode=episode['airedEpisodeNumber']).first()
+                print('episode_exists:', episode_exists)
+                if not episode_exists:
+                    episode_to_add = Episode(episode=episode['airedEpisodeNumber'],
+                                             season_id=season_exists.season_id,
+                                             air_date=episode['firstAired'])
+                    print('episode:', episode_to_add)
+                    db.session.add(episode_to_add)
+                    episode_exists = Episode.query.filter_by(season_id=season_exists.season_id,
+                                                         episode=episode['airedEpisodeNumber']).first()
+        db.session.commit()
+
+
+    return redirect(url_for('list_shows'))
 

@@ -1,57 +1,52 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<h1>List TV Shows</h1>
+<style>
+    table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+        padding-left: 10px;
+        padding-right: 10px;
+        text-align: center;
+    }
+</style>
+
+<h1>Update Shows</h1>
+
+<h3>Entries</h3>
+{% for entry in entries %}
 <div>
-    {% if entries %}
-    <div>
-        {% for entry in entries %}
-        <div>
-            <hr>
+    <h4>{{ entry['show'] }}</h4>
+    Aired Seasons: {{ entry['aired_seasons'] }}
+
+    {% for season in entry['seasons'] %}
+    <div style="margin-left: 100px">
+        <p>Season: {{ season['season'] }}</p>
+        <div style="margin-left: 100px">
             <table>
                 <tr>
-                    <td>
-                        Show
-                    </td>
-                    <td>
-                        {{ entry['show_name'] }} 
-                        <small>(id: {{ entry['show_id'] }})</small>
-                    </td>
+                    <th>
+                        Episode
+                    </th>
+                    <th>
+                        Air Date
+                    </th>
                 </tr>
-                {% if entry['show_name'] != entry['show_dir'] %}
+                {% for episode in season['episodes'] %}
                 <tr>
                     <td>
-                        Directory
+                        {{ episode['episode'] }}
                     </td>
                     <td>
-                        {{ entry['show_dir'] }}
+                        {{ episode['air_date'] }}
                     </td>
                 </tr>
-                {% endif %}
-                <tr>
-                    <td>
-                        Watching
-                    </td>
-                    <td>
-                        {{ entry['watching'] }}
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        theTVDB id
-                    </td>
-                    <td>
-                        {{ entry['theTVDB_id'] }}
-                    </td>
-                </tr>
+                {% endfor %}
             </table>
         </div>
-        {% endfor %}
     </div>
-    {% else %}
-    <span style="color: red; font-style: italic; margin-left: 100px">
-        No new shows to list
-    </span>
-    {% endif %}
+    {% endfor %}
 </div>
+{% endfor %}
+
 {% endblock %}
