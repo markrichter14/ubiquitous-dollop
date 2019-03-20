@@ -21,6 +21,17 @@ class Show(db.Model):
     def __repr__(self):
         return '<Show {} ({})>'.format(self.show_name, self.show_id)
 
+class Show_Alias(db.Model):
+    '''
+        table for TV Shows Title Aliases
+    '''
+    alias_id = db.Column(db.Integer, primary_key=True)
+    alias_name = db.Column(db.String(64), index=True)
+    show_id = db.Column(db.Integer, db.ForeignKey('show.show_id'))
+
+    def __repr__(self):
+        return '<Alias {} ({}, {})>'.format(self.alias_name, self.alias_id, self.show_id)
+
 class Season(db.Model):
     '''
         table for TV Shows Seasons
@@ -41,6 +52,8 @@ class Episode(db.Model):
     episode = db.Column(db.Integer, index=True, unique=False)
     downloaded = db.Column(db.Boolean, unique=False, default=False)
     season_id = db.Column(db.Integer, db.ForeignKey('season.season_id'))
+    theTVDB_id = db.Column(db.Integer, index=True, unique=True)
+    theTVDB_name = db.Column(db.String(64), index=True)
     air_date = db.Column(db.String(64), index=True, unique=False)
 
     def __repr__(self):

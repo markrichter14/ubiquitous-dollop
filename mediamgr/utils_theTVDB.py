@@ -114,7 +114,49 @@ class TheTVDB_API():
     @memoize_with_limit
     def series_episodes_query(self, series_id, season=None, episode=None, page=1):
         '''
-            Error 401, 404, 405
+            This route allows the user to query against episodes for the given
+            series. The response is a paginated array of episode records.
+
+            {"data": [{ "absoluteNumber": 0,
+                        "airedEpisodeNumber": 0,
+                        "airedSeason": 0,
+                        "airsAfterSeason": 0,
+                        "airsBeforeEpisode": 0,
+                        "airsBeforeSeason": 0,
+                        "director": "string",
+                        "directors": ["string"],
+                        "dvdChapter": 0,
+                        "dvdDiscid": "string",
+                        "dvdEpisodeNumber": 0,
+                        "dvdSeason": 0,
+                        "episodeName": "string",
+                        "filename": "string",
+                        "firstAired": "string",
+                        "guestStars": ["string"],
+                        "id": 0,
+                        "imdbId": "string",
+                        "lastUpdated": 0,
+                        "lastUpdatedBy": "string",
+                        "overview": "string",
+                        "productionCode": "string",
+                        "seriesId": "string",
+                        "showUrl": "string",
+                        "siteRating": 0,
+                        "siteRatingCount": 0,
+                        "thumbAdded": "string",
+                        "thumbAuthor": 0,
+                        "thumbHeight": "string",
+                        "thumbWidth": "string",
+                        "writers": ["string"]}],
+            "errors": { "invalidFilters": ["string"],
+                        "invalidLanguage": "string",
+                        "invalidQueryParams": ["string"]},
+            "links": {  "first": 0,
+                        "last": 0,
+                        "next": 0,
+                        "previous": 0} }
+
+            May return Errors 401, 404, 405
         '''
         # print('\nCall: series_episodes_query - {} {} {} {}'.format(series_id,
         #                                                            season,
@@ -123,9 +165,9 @@ class TheTVDB_API():
         url = self.BASE_URL + '/series/{}/episodes/query'.format(series_id)
         headers = {'Authorization' : 'Bearer ' + self.token}
         payload = {'page': page}
-        if season:
+        if season is not None:
             payload['airedSeason'] = season
-        if episode:
+        if episode is not None:
             payload['airedEpisode'] = episode
         # print('payload:', payload)
         req = requests.get(url, headers=headers, params=payload,

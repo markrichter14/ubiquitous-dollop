@@ -2,7 +2,9 @@
 
 {% block content %}
 <style>
-    table, th, td {
+    table,
+    th,
+    td {
         border: 1px solid black;
         border-collapse: collapse;
         padding-left: 10px;
@@ -13,15 +15,40 @@
 
 <h1>Update Shows</h1>
 
-<h3>Entries</h3>
 {% for entry in entries %}
 <div>
     <h4>{{ entry['show'] }}</h4>
-    Aired Seasons: {{ entry['aired_seasons'] }}
+
+    <table>
+        <tr>
+            <td style="text-align:right;">
+                dir:
+            </td>
+            <td>
+                {{ entry['show_dir'] }}
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align:right;">
+                watching:
+            </td>
+            <td>
+                {{ entry['watching'] }}
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align:right;">
+                theTVDB id:
+            </td>
+            <td>
+                {{ entry['theTVDB_id'] }}
+            </td>
+        </tr>
+    </table>
 
     {% for season in entry['seasons'] %}
     <div style="margin-left: 100px">
-        <p>Season: {{ season['season'] }}</p>
+        <p>Season: {{ season['season'] }} <small>({{ entry['show'] }})</small></p>
         <div style="margin-left: 100px">
             <table>
                 <tr>
@@ -31,6 +58,15 @@
                     <th>
                         Air Date
                     </th>
+                    <th>
+                        Downloaded
+                    </th>
+                    <th>
+                        theTVDB id
+                    </th>
+                    <th>
+                        theTVDB name
+                    </th>
                 </tr>
                 {% for episode in season['episodes'] %}
                 <tr>
@@ -39,6 +75,15 @@
                     </td>
                     <td>
                         {{ episode['air_date'] }}
+                    </td>
+                    <td>
+                        {{ episode['downloaded'] }}
+                    </td>
+                    <td>
+                        {{ episode['theTVDB_id'] }}
+                    </td>
+                    <td style="text-align: left;">
+                        {{ episode['theTVDB_name'] }}
                     </td>
                 </tr>
                 {% endfor %}
