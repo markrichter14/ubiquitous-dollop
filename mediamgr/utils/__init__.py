@@ -20,6 +20,7 @@ import shutil
 import time
 
 VALID = [".mp4", ".avi", ".srt", ".m4v", ".mkv", ".mpg"]
+# VIDEO = [".mp4", ".avi", ".m4v", ".mkv", ".mpg"]
 
 def rm_extra_files(dir_path):
     '''

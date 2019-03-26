@@ -11,12 +11,14 @@
 
 <body>
     <div>
-        NAS Media Manager: <a href="{{ url_for('home') }}">[Home]</a>
-                           <a href="{{ url_for('new_shows') }}">[New Shows]</a>
-                           <a href="{{ url_for('add_shows') }}">[Add Shows]</a>
-                           <a href="{{ url_for('update_shows') }}">[Update Shows]</a>
-                           <a href="{{ url_for('list_shows') }}">[List Shows]</a>
-                           <a href="{{ url_for('read_media_tv') }}">[Read Media]</a>
+        NAS Media Manager:
+        <a href="{{ url_for('home') }}">[Home]</a>
+        <a href="{{ url_for('new_shows') }}">[New Shows]</a>
+        <a href="{{ url_for('new_shows_from_media') }}">[New Shows from Media]</a>
+        <a href="{{ url_for('add_shows') }}">[Add Shows]</a>
+        <a href="{{ url_for('update_shows') }}">[Update Shows]</a>
+        <a href="{{ url_for('list_shows') }}">[List Shows]</a>
+        <a href="{{ url_for('read_media_tv') }}">[Read Media]</a>
     </div>
     {% with messages = get_flashed_messages() %}
     {% if messages %}

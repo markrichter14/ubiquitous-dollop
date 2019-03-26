@@ -12,6 +12,7 @@ class Show(db.Model):
     show_name = db.Column(db.String(64), index=True)
     show_dir = db.Column(db.String(64), index=True, unique=True)
     watching = db.Column(db.Boolean, unique=False, default=True)
+    # ignore_specials = db.Column(db.Boolean, unique=False, default=False)
     theTVDB_id = db.Column(db.Integer, index=True, unique=True)
     theTVDB_name = db.Column(db.String(64), index=True)
     theTVDB_slug = db.Column(db.String(64), index=True)
@@ -21,7 +22,7 @@ class Show(db.Model):
     def __repr__(self):
         return '<Show {} ({})>'.format(self.show_name, self.show_id)
 
-class Show_Alias(db.Model):
+class ShowAlias(db.Model):
     '''
         table for TV Shows Title Aliases
     '''
@@ -40,6 +41,7 @@ class Season(db.Model):
     season = db.Column(db.Integer, index=True, unique=False)
     show_id = db.Column(db.Integer, db.ForeignKey('show.show_id'))
     episodes = db.relationship('Episode', backref='season', lazy='dynamic')
+    # complete = db.Column(db.Boolean, unique=False, default=False)
 
     def __repr__(self):
         return '<Season {} ({}, {})>'.format(self.season, self.season_id, self.show_id)

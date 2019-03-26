@@ -6,11 +6,11 @@ from pathlib import Path
 from flask import render_template, redirect, flash, url_for
 from werkzeug.utils import secure_filename
 from mediamgr import app, db
-from mediamgr.utils import (VALID, rm_extra_files, tmdb, parse_movie_fn,
-                            get_data, fix_filename)
 from mediamgr.forms import (MovieForm, LoginForm, ShowForm, NewShowsForm)
 from mediamgr.models import Show, Season, Episode, NewShow
-from mediamgr.utils_theTVDB import TheTVDB_API
+from mediamgr.utils import (VALID, rm_extra_files, get_data, fix_filename)
+from mediamgr.utils.smb import send_file, get_file, list_files, list_dirs
+from mediamgr.utils.theTVDB import TheTVDB_API
 
 MOVIE_DIR = app.config['MOVIE_DIR']
 TV_DIR = app.config['TV_DIR']
@@ -110,6 +110,25 @@ def new_shows():
         return redirect(url_for('add_shows'))
     return render_template('new_shows.html', title='New Shows', form=form)
 
+@app.route('/new_shows_from_media')
+def new_shows_from_media():
+    '''
+        page to add new show to db from media tv show dirs
+    '''
+    print('*** Call: new_shows_from_media')
+
+    new_shows_to_add = list_dirs(MEDIA_TV)
+
+    if new_shows_to_add:
+        for line in new_shows_to_add:
+            name = line.strip()
+            ns_db = NewShow.query.filter_by(new_show_name=name).first()
+            if not ns_db:
+                new_show_to_add = NewShow(new_show_name=name)
+                db.session.add(new_show_to_add)
+        db.session.commit()
+    return redirect(url_for('add_shows'))
+
 @app.route('/delete_new_show/<int:ns_id>', methods=['POST'])
 def delete_new_show(ns_id):
     '''
@@ -149,6 +168,7 @@ def add_shows():
         if data:
             for data_item in data:
                 data_item['fixed'] = fix_filename(data_item['seriesName'])
+                data_item['dir_match'] = data_item['fixed'] == entry['name']
                 if Show.query.filter_by(theTVDB_id=data_item['id']).all():
                     data_item['exists'] = True
                     matches |= True
@@ -158,7 +178,7 @@ def add_shows():
 
     form = ShowForm()
     if form.validate_on_submit():
-        print('validate add_shows')
+        # print('validate add_shows')
         show_to_add = Show(show_name=form.show_name.data,
                            show_dir=form.show_dir.data,
                            watching=form.watching.data,
@@ -169,12 +189,12 @@ def add_shows():
         print(show_to_add)
         db.session.add(show_to_add)
         new_show_added = NewShow.query.filter_by(new_show_id=form.new_show_id.data).first()
-        print(new_show_added)
+        print('deleting added show:', new_show_added)
         if new_show_added:
             db.session.delete(new_show_added)
         db.session.commit()
-        print(Show.query.all())
-        print(NewShow.query.all())
+        # print(Show.query.all())
+        # print(NewShow.query.all())
         return redirect(url_for('add_shows'))
     return render_template('add_shows.html', title='Add TV Shows',
                            entries=entries, form=form)
@@ -195,12 +215,14 @@ def list_shows():
         show_entry['watching'] = show.watching
         show_entry['theTVDB_id'] = show.theTVDB_id
         show_entry['seasons'] = []
-        seasons_qry = Season.query.filter_by(show_id=show.show_id).order_by(Season.season).all()
+        seasons_qry = Season.query.filter_by(show_id=show.show_id)\
+                                  .order_by(Season.season).all()
         for season in seasons_qry:
             season_entry = {}
             season_entry['season'] = season.season
             season_entry['episodes'] = []
-            episodes_qry = Episode.query.filter_by(season_id=season.season_id).order_by(Episode.episode).all()
+            episodes_qry = Episode.query.filter_by(season_id=season.season_id)\
+                                        .order_by(Episode.episode).all()
             for episode in episodes_qry:
                 episode_entry = {}
                 episode_entry['episode'] = episode.episode
@@ -213,7 +235,7 @@ def list_shows():
         entries.append(show_entry)
 
     return render_template('list_shows.html', title='List TV Shows',
-                                              entries=entries)
+                           entries=entries)
 
 @app.route('/episodes')
 def episodes():
@@ -266,9 +288,9 @@ def update_shows():
                                   key=lambda x: x['airedEpisodeNumber']):
                 print('s{:02d}e{:02d}'.format(season_num, episode['airedEpisodeNumber']))
                 # print(episode)
-                episode_exists = Episode.query.filter_by(
-                                    season_id=season_exists.season_id,
-                                    episode=episode['airedEpisodeNumber']).first()
+                episode_exists = Episode.query.filter_by(season_id=season_exists.season_id,
+                                                         episode=episode['airedEpisodeNumber'])\
+                                              .first()
                 print('episode_exists:', episode_exists)
                 if not episode_exists:
                     episode_to_add = Episode(episode=episode['airedEpisodeNumber'],
@@ -278,9 +300,9 @@ def update_shows():
                                              air_date=episode['firstAired'])
                     print('episode:', episode_to_add, episode_to_add.theTVDB_id)
                     db.session.add(episode_to_add)
-                    episode_exists = Episode.query.filter_by(
-                                        season_id=season_exists.season_id,
-                                        episode=episode['airedEpisodeNumber']).first()
+                    episode_exists = Episode.query.filter_by(season_id=season_exists.season_id,
+                                                             episode=episode['airedEpisodeNumber'])\
+                                                  .first()
                     print('episode_exists:', episode_exists)
                 else:
                     episode_exists.theTVDB_id = episode['id']
@@ -298,44 +320,14 @@ def read_media_tv():
     '''
     print('\n\n*** Call: read_media_tv')
 
-    from smb.SMBConnection import SMBConnection
+    files = list_files(MEDIA_TV)
+    # entries = {}
+    for file in files:
+        if file[-4:] in VALID and file[-4:] != ".srt":
+            fields = file.split('/')
+            filename = fields[5]
+            season = int(fields[4].split()[1])
+            show = fields[3]
+            print('{} - {} - {}'.format(show, season, filename))
 
-    userID = 'osmc'
-    password = 'osmc'
-    client_machine_name = 'epsilon'
-
-    server_name = 'osmc'
-    server_ip = '192.168.4.10'
-
-    domain_name = 'WORKGROUP'
-
-    conn = SMBConnection(userID, password, client_machine_name, server_name,
-                         domain=domain_name, use_ntlm_v2=True,
-                         is_direct_tcp=True)
-
-    conn.connect(server_ip, 445)
-
-    shares = conn.listShares()
-
-    for share in shares:
-        print('\n\n==========\n', share.name, '\n==========')
-        if not share.isSpecial and share.name not in ['NETLOGON', 'SYSVOL']:
-            sharedfiles = conn.listPath(share.name, '/')
-            for sharedfile in sharedfiles:
-                print(sharedfile.filename)
-
-    conn.close()
-
-    # with open('pysmb.py', 'rb') as file:
-    #     conn.storeFile('remotefolder', 'pysmb.py', file)
-
-    shows = Show.query.order_by(Show.show_name).all()
-    for show in shows:
-        print('\n{} - {}'.format(show.show_name, show.theTVDB_id))
-        pth = Path(MEDIA_TV)
-        pth = Path(TV_DIR)
-        pth = Path('\\\\osmc\\')
-
-        # print(pth)
-        # print(pth.name)
     return redirect(url_for('list_shows'))

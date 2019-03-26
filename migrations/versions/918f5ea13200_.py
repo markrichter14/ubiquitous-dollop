@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: cd39e5d6de84
+Revision ID: 918f5ea13200
 Revises: 
-Create Date: 2019-03-19 03:47:09.795978
+Create Date: 2019-03-21 12:37:43.926545
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'cd39e5d6de84'
+revision = '918f5ea13200'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -49,14 +49,14 @@ def upgrade():
     sa.PrimaryKeyConstraint('season_id')
     )
     op.create_index(op.f('ix_season_season'), 'season', ['season'], unique=False)
-    op.create_table('show__alias',
+    op.create_table('show_alias',
     sa.Column('alias_id', sa.Integer(), nullable=False),
     sa.Column('alias_name', sa.String(length=64), nullable=True),
     sa.Column('show_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['show_id'], ['show.show_id'], ),
     sa.PrimaryKeyConstraint('alias_id')
     )
-    op.create_index(op.f('ix_show__alias_alias_name'), 'show__alias', ['alias_name'], unique=False)
+    op.create_index(op.f('ix_show_alias_alias_name'), 'show_alias', ['alias_name'], unique=False)
     op.create_table('episode',
     sa.Column('episode_id', sa.Integer(), nullable=False),
     sa.Column('episode', sa.Integer(), nullable=True),
@@ -82,8 +82,8 @@ def downgrade():
     op.drop_index(op.f('ix_episode_episode'), table_name='episode')
     op.drop_index(op.f('ix_episode_air_date'), table_name='episode')
     op.drop_table('episode')
-    op.drop_index(op.f('ix_show__alias_alias_name'), table_name='show__alias')
-    op.drop_table('show__alias')
+    op.drop_index(op.f('ix_show_alias_alias_name'), table_name='show_alias')
+    op.drop_table('show_alias')
     op.drop_index(op.f('ix_season_season'), table_name='season')
     op.drop_table('season')
     op.drop_index(op.f('ix_show_theTVDB_status'), table_name='show')

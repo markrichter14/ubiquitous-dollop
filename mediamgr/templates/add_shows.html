@@ -63,7 +63,13 @@
                                         {{ form.show_dir.label }}
                                     </td>
                                     <td>
-                                        {{ form.show_dir(size=35, value=item['fixed']) }}<br>
+                                        {{ form.show_dir(size=35, value=item['fixed']) }}
+                                        {% if item['dir_match'] %}
+                                        <span style="color: blue;">
+                                                Directory Name Matches!
+                                        </span>
+                                        {% endif %}
+                                        <br>
                                         {% for error in form.show_dir.errors %}
                                         <span style="color: red;">
                                             [{{ error }}]
